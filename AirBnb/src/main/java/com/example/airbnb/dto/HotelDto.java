@@ -13,7 +13,7 @@ public class HotelDto {
     Long id;
     String name;
     String address;
-    String[] photos;
+//    String[] photos;
     String[] amenities;
     HotelContactInfor contactInfor;
     Boolean active;

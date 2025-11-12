@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 public class RoomDto {
     Long id;
     String type;
-    String[] images;
     BigDecimal basePrice;
     String[] amenities;
     Integer totalCount;

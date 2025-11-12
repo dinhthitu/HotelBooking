@@ -31,6 +31,7 @@ public class Hotel {
     @Column(columnDefinition = "TEXT[]")
     String[] amenities;
 
+
     @CreationTimestamp
     LocalDateTime createdAt;
 
