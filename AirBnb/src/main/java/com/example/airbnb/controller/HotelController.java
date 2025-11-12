@@ -7,13 +7,16 @@ import com.example.airbnb.service.BookingService;
 import com.example.airbnb.service.HotelService;
 import com.example.airbnb.service.InventoryService;
 import com.example.airbnb.service.RoomService;
+import com.example.airbnb.util.Helper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -109,6 +112,30 @@ public class HotelController {
                 .result(bookingService.getAllBookingByHotel(hotelId))
                 .build();
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
+    @PostMapping(value = "/{hotelId}/images", consumes = "multipart/form-data")
+    public ApiResponse<String[]> uploadHotelImages(
+            @PathVariable Long hotelId,
+            @RequestParam("files") MultipartFile[] files) throws IOException {
+
+        return ApiResponse.<String[]>builder()
+                .result(hotelService.uploadImages(hotelId, files))
+                .build();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
+    @DeleteMapping("/{hotelId}/images")
+    public ApiResponse<Void> deleteHotelImage(
+            @PathVariable Long hotelId,
+            @RequestParam("fileUrl") String fileUrl) throws IOException {
+
+        hotelService.deleteFile(hotelId, fileUrl);
+        return ApiResponse.<Void>builder().build();
+    }
+
+
+
 
 
 }
