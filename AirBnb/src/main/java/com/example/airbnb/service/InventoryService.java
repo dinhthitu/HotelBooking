@@ -1,5 +1,6 @@
 package com.example.airbnb.service;
 
+import com.example.airbnb.dto.HotelDto;
 import com.example.airbnb.dto.HotelPrice;
 import com.example.airbnb.dto.InventoryDto;
 import com.example.airbnb.dto.request.HotelSearchRequest;
@@ -66,6 +67,26 @@ public class InventoryService {
         inventoryRepository.deleteAllByRoom(room);
     }
 
+    public boolean isRoomAvailable(
+            Long hotelId,
+            Long roomId,
+            LocalDate checkIn,
+            LocalDate checkOut
+    ) {
+        long availableDays = inventoryRepository.countAvailableDays(
+                hotelId, roomId, checkIn, checkOut);
+
+        long totalDays = ChronoUnit.DAYS.between(checkIn, checkOut);
+
+        return availableDays == totalDays;
+    }
+
+
+    public List<HotelDto> searchAvailableHotels(Long roomId, LocalDate checkIn, LocalDate checkOut) {
+        return inventoryRepository.findAvailableHotels(
+                roomId, checkIn, checkOut);
+    }
+
 
     // chua test search
 
@@ -98,6 +119,6 @@ public class InventoryService {
                 request.getClosed(), request.getSurgeFactor());
 
     }
-
-
 }
+
+

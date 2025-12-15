@@ -1,5 +1,6 @@
 package com.example.airbnb.controller;
 
+import com.cloudinary.Api;
 import com.example.airbnb.dto.*;
 import com.example.airbnb.dto.request.HotelSearchRequest;
 import com.example.airbnb.entities.HotelContactInfor;
@@ -12,11 +13,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,12 +42,32 @@ public class HotelController {
                 .build();
     }
 
-//    @GetMapping("/{hotelId}")
-//    public ApiResponse<HotelDto> getHotelById(@PathVariable Long hotelId){
-//        return ApiResponse.<HotelDto>builder()
-//                .result(hotelService.getHotelById(hotelId))
-//                .build();
-//    }
+    @GetMapping("/search-hotels")
+    public ApiResponse<List<HotelDto>> searchHotels(
+            @RequestParam Long roomId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut
+    ) {
+        return ApiResponse.<List<HotelDto>>builder()
+                .result(inventoryService.searchAvailableHotels(roomId, checkIn, checkOut))
+                .build();
+    }
+
+    @GetMapping("/availability")
+    public ApiResponse<Boolean> checkAvailability(
+            @RequestParam Long hotelId,
+            @RequestParam Long roomId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut
+    ) {
+        boolean available = inventoryService.isRoomAvailable(
+                hotelId, roomId, checkIn, checkOut);
+
+        return ApiResponse.<Boolean>builder()
+                .result(available)
+                .build();
+    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
     @PatchMapping("/update/{hotelId}")

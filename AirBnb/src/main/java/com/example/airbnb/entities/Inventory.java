@@ -40,15 +40,15 @@ public class Inventory {
     @Column(nullable = false,precision = 10,scale = 2)
     private BigDecimal price;
     String address;
-    Boolean closed;
+    boolean closed;
     @CreationTimestamp
             LocalDateTime createdAt;
     @UpdateTimestamp
             LocalDateTime updatedAt;
     LocalDate inventory_date;
-    Integer reversedCount;
-    Integer totalCount;
-    Integer bookedCount;
+    int reversedCount;
+    int totalCount;
+    int bookedCount;
 
 
 }

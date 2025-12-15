@@ -1,4 +1,5 @@
 package com.example.airbnb.repository;
+import com.example.airbnb.dto.HotelDto;
 import com.example.airbnb.dto.HotelPrice;
 import com.example.airbnb.entities.Hotel;
 import com.example.airbnb.entities.Inventory;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
+
     void deleteAllByRoom(Room room);
 
     @Query("SELECT i FROM Inventory i WHERE i.room = :room ORDER BY i.inventory_date ASC")
@@ -124,4 +126,41 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             @Param("endDate") LocalDate checkOutDate,
             @Param("numberOfRooms") Integer roomsCount);
 
+
+    @Query("""
+    SELECT COUNT(i)
+    FROM Inventory i
+    WHERE i.hotel.id = :hotelId
+      AND i.room.id = :roomId
+      AND i.inventory_date >= :checkIn
+      AND i.inventory_date < :checkOut
+      AND i.closed = false
+      AND i.bookedCount < i.totalCount
+    """)
+    long countAvailableDays(
+            @Param("hotelId") Long hotelId,
+            @Param("roomId") Long roomId,
+            @Param("checkIn") LocalDate checkIn,
+            @Param("checkOut") LocalDate checkOut
+    );
+
+
+    @Query("""
+    SELECT i.hotel
+    FROM Inventory i
+    WHERE i.room.id = :roomId
+      AND i.inventory_date >= :checkIn
+      AND i.inventory_date < :checkOut
+      AND i.closed = false
+    GROUP BY i.hotel.id
+    HAVING MIN(i.totalCount - i.bookedCount) > 0
+    """)
+    List<HotelDto> findAvailableHotels(
+            @Param("roomId") Long roomId,
+            @Param("checkIn") LocalDate checkIn,
+            @Param("checkOut") LocalDate checkOut
+        );
+
+
 }
+
